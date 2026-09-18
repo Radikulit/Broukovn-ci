@@ -5,44 +5,38 @@ public class PlateManager : MonoBehaviour
 {
     public static PlateManager Instance { get; private set; }
 
-    [Header("Все плитки арены")]
     public List<Plate> allPlates = new List<Plate>();
-
-    // Плитка под курсором
-    public Plate HoveredPlate { get; private set; }
+    public List<Dot> allDots = new List<Dot>();
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        // Если список не заполнен вручную в инспекторе, находим все плитки
-        if (allPlates.Count == 0)
-        {
-            allPlates.AddRange(Object.FindObjectsByType<Plate>(FindObjectsSortMode.None));
-        }
-
-        // Сортируем плитки по tileIndex
-        allPlates.Sort((a, b) => a.tileIndex.CompareTo(b.tileIndex));
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
-    public void SetHoveredPlate(Plate plate)
+    private void Start()
     {
-        HoveredPlate = plate;
+        // Небольшая задержка гарантирует, что все Awake у объектов прошли
+        Invoke(nameof(SetDefaultGrid), 0.02f);
     }
 
-    // Получить плитку по индексу (с учетом кольца)
-    public Plate GetPlateByIndex(int index)
+    public void SetDefaultGrid()
     {
-        if (allPlates.Count == 0) return null;
-        int normalizedIndex = (index % allPlates.Count + allPlates.Count) % allPlates.Count;
-        return allPlates.Find(p => p != null && p.tileIndex == normalizedIndex);
+        SwitchGridMode(1);
+    }
+
+    public void SwitchGridMode(int unitSize)
+    {
+        bool isLarge = (unitSize == 2);
+
+        foreach (var plate in allPlates)
+        {
+            if (plate != null) plate.SetActiveState(!isLarge);
+        }
+
+        foreach (var dot in allDots)
+        {
+            if (dot != null) dot.SetActiveState(isLarge);
+        }
     }
 }

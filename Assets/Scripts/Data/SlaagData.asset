@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: SlaagData
   m_EditorClassIdentifier: 
   unitName: Fat Slaag
-  unitPrefab: {fileID: 4514462597580661797, guid: e18e0c769e496cc43bc5768b699d01a3, type: 3}
+  unitPrefab: {fileID: 7542426937713440756, guid: 2ace4b6ab48fc574189e3a24c1601c6e, type: 3}
   health: 12
   armor: 0
   damage: 1
-  speed: 2
-  range: 1
+  speed: 0.5
+  range: 0.1
   psycho: 2
+  unitSize: 2

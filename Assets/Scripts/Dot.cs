@@ -1,33 +1,33 @@
 using UnityEngine;
 
-public class Plate : MonoBehaviour
+public class Dot : MonoBehaviour
 {
     public Unit currentUnit;
     public Material hoverMaterial; // Перетащите сюда материал подсветки в Инспекторе
 
-    private Collider plateCollider;
+    private Collider dotCollider;
     private MeshRenderer meshRenderer;
     private Material defaultMaterial;
 
     private void Awake()
     {
-        plateCollider = GetComponent<Collider>();
+        dotCollider = GetComponent<Collider>();
         meshRenderer = GetComponent<MeshRenderer>();
         if (meshRenderer != null) defaultMaterial = meshRenderer.material;
     }
 
     private void OnMouseDown()
     {
-        if (Unit.SelectedUnit != null && Unit.SelectedUnit.unitData.unitSize == 1)
+        if (Unit.SelectedUnit != null && Unit.SelectedUnit.unitData.unitSize == 2)
         {
-            Unit.SelectedUnit.MoveToPlate(this);
+            Unit.SelectedUnit.MoveToDot(this);
         }
     }
 
     private void OnMouseEnter()
     {
-        // Подсвечиваем только если плитка активна и не занята
-        if (plateCollider != null && !plateCollider.enabled) return;
+        // Подсвечиваем только если точка активна
+        if (dotCollider != null && !dotCollider.enabled) return;
         if (hoverMaterial != null && meshRenderer != null)
         {
             meshRenderer.material = hoverMaterial;
@@ -40,14 +40,13 @@ public class Plate : MonoBehaviour
         if (defaultMaterial != null && meshRenderer != null)
         {
             meshRenderer.material = defaultMaterial;
-            // Восстанавливаем прозрачность для текущего состояния
-            SetActiveState(plateCollider != null && plateCollider.enabled);
+            SetActiveState(dotCollider != null && dotCollider.enabled);
         }
     }
 
     public void SetActiveState(bool active)
     {
-        if (plateCollider != null) plateCollider.enabled = active;
+        if (dotCollider != null) dotCollider.enabled = active;
 
         if (meshRenderer != null && meshRenderer.material != null)
         {
