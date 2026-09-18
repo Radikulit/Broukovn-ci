@@ -3704,6 +3704,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &833130749 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 980812871694942412, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
+  m_PrefabInstance: {fileID: 8397949487550200514}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &845316481
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5140,6 +5145,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0852e1674e6f7574eaafd6f86da5961d, type: 3}
+--- !u!95 &1352749839 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 3302601536292371483, guid: decb3f8d1ec263a40b16dc4b432370b8, type: 3}
+  m_PrefabInstance: {fileID: 7638489564400450691}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1357210572 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 336775903082458585, guid: 0852e1674e6f7574eaafd6f86da5961d, type: 3}
@@ -8552,6 +8562,14 @@ PrefabInstance:
       value: RhinoBug
       objectReference: {fileID: 0}
     - target: {fileID: 6648795225284430948, guid: decb3f8d1ec263a40b16dc4b432370b8, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 1352749839}
+    - target: {fileID: 6648795225284430948, guid: decb3f8d1ec263a40b16dc4b432370b8, type: 3}
+      propertyPath: moveSpeed
+      value: 0.625
+      objectReference: {fileID: 0}
+    - target: {fileID: 6648795225284430948, guid: decb3f8d1ec263a40b16dc4b432370b8, type: 3}
       propertyPath: currentPlate
       value: 
       objectReference: {fileID: 1433877935}
@@ -8571,6 +8589,14 @@ PrefabInstance:
     - target: {fileID: 855631438456948806, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
       propertyPath: m_Name
       value: FatSlaag
+      objectReference: {fileID: 0}
+    - target: {fileID: 2209309623986001980, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 833130749}
+    - target: {fileID: 2209309623986001980, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
+      propertyPath: moveSpeed
+      value: 0.275
       objectReference: {fileID: 0}
     - target: {fileID: 2209309623986001980, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
       propertyPath: currentDot

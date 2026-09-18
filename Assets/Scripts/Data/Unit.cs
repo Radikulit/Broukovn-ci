@@ -4,6 +4,7 @@ using UnityEngine;
 public class Unit : MonoBehaviour
 {
     [Header("Данные и ссылки")]
+    public Animator animator;
     public UnitData unitData;
     public float moveSpeed = 5f;
     public Plate currentPlate;
@@ -102,6 +103,11 @@ public class Unit : MonoBehaviour
         isMoving = true;
         Vector3 destination = GetFlatPosition(targetPos);
 
+        if (animator != null)
+        {
+            animator.SetTrigger("move");
+        }
+
         while (Vector3.Distance(transform.position, destination) > 0.05f)
         {
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
@@ -109,6 +115,14 @@ public class Unit : MonoBehaviour
         }
 
         transform.position = destination;
+
+        // Сбрасываем триггер и принудительно возвращаем в IDLE
+        if (animator != null)
+        {
+            animator.ResetTrigger("move");
+            animator.Play("IDLE", 0, 0f); // Мгновенно переключает в IDLE с начала клипа
+        }
+
         onComplete?.Invoke();
         isMoving = false;
     }
