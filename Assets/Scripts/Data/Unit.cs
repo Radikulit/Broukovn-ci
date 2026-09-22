@@ -103,24 +103,30 @@ public class Unit : MonoBehaviour
         isMoving = true;
         Vector3 destination = GetFlatPosition(targetPos);
 
-        if (animator != null)
+        // 1. Поворот спрайта (true если идем вправо, false если влево)
+        if (spriteRenderer != null && destination.x != transform.position.x)
         {
-            animator.SetTrigger("move");
+            spriteRenderer.flipX = destination.x > transform.position.x;
         }
 
+        if (animator != null) animator.SetTrigger("move");
+
+        // 2. Движение к цели
         while (Vector3.Distance(transform.position, destination) > 0.05f)
         {
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
             yield return null;
         }
 
+        // 3. Завершение движения и сброс состояния (взгляд влево + IDLE)
         transform.position = destination;
 
-        // Сбрасываем триггер и принудительно возвращаем в IDLE
+        if (spriteRenderer != null) spriteRenderer.flipX = false;
+
         if (animator != null)
         {
             animator.ResetTrigger("move");
-            animator.Play("IDLE", 0, 0f); // Мгновенно переключает в IDLE с начала клипа
+            animator.Play("IDLE", 0, 0f);
         }
 
         onComplete?.Invoke();
