@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Rhino Bug
   unitPrefab: {fileID: 636748759368138398, guid: a87c59a2b67575343823dbf5b8cb3690, type: 3}
+  unitIcon: {fileID: 21300000, guid: 76df3bafe441cde45a4547d782b33b25, type: 3}
   health: 8
   armor: 4
   damage: 1
