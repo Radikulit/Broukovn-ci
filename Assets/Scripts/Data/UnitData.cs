@@ -5,6 +5,7 @@ public class UnitData : ScriptableObject
 {
     public string unitName;
     public GameObject unitPrefab;
+    public Sprite unitIcon;
     public float health;
     public float armor;
     public float damage;

@@ -43,25 +43,22 @@ public class Unit : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (isMoving) return;
+        if (isMoving || (TurnManager.Instance && TurnManager.Instance.CurrentUnit != this)) return;
 
-        if (SelectedUnit == this)
-        {
-            Deselect();
-            return;
-        }
-
+        if (SelectedUnit == this) Deselect();
+        else SelectUnit();
+    }
+    public void SelectUnit()
+    {
         SelectedUnit?.Deselect();
         SelectedUnit = this;
 
-        // Переключаем сетку под размер текущего юнита
-        if (PlateManager.Instance != null && unitData != null)
-        {
-            PlateManager.Instance.SwitchGridMode(unitData.unitSize);
-        }
+        if (PlateManager.Instance && unitData) PlateManager.Instance.SwitchGridMode(unitData.unitSize);
 
+        if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
         blinkCoroutine = StartCoroutine(BlinkRoutine());
     }
+
 
     // Движение маленького юнита по Плиткам (unitSize = 1)
     public void MoveToPlate(Plate targetPlate)
@@ -131,6 +128,12 @@ public class Unit : MonoBehaviour
 
         onComplete?.Invoke();
         isMoving = false;
+        onComplete?.Invoke();
+        
+        isMoving = false;
+
+        // Передаем ход следующему
+        if (TurnManager.Instance) TurnManager.Instance.NextTurn();
     }
 
     private Vector3 GetFlatPosition(Vector3 targetPos) => new Vector3(targetPos.x, transform.position.y, targetPos.z);
