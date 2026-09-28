@@ -11,10 +11,10 @@ public class Unit : MonoBehaviour
     public Dot currentDot; // Ссылка на текущую точку для толстяка (unitSize == 2)
     public Transform attackRange;
     public Transform movementRange;
+    public bool isMoving;
 
     public static Unit SelectedUnit { get; private set; }
 
-    private bool isMoving;
     private SpriteRenderer spriteRenderer;
     private Coroutine blinkCoroutine;
 

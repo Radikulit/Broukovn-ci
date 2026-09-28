@@ -118,4 +118,23 @@ public class TurnManager : MonoBehaviour
             iconObj.transform.localScale = Vector3.one * 1.15f;
         }
     }
+    public void PassTurn()
+    {
+        // Меняем IsMoving на isMoving с маленькой буквы
+        if (CurrentUnit != null && CurrentUnit.isMoving) return;
+
+        if (UnityEngine.EventSystems.EventSystem.current != null)
+        {
+            GameObject currentButton = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+            if (currentButton != null)
+            {
+                Animator btnAnimator = currentButton.GetComponent<Animator>();
+                if (btnAnimator != null)
+                {
+                    btnAnimator.SetTrigger("flip");
+                }
+            }
+        }
+        NextTurn();
+    }
 }
