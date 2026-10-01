@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.Events; // Обязательно добавляем эту директиву!
 using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
@@ -71,11 +71,9 @@ public class TurnManager : MonoBehaviour
 
     public void PassTurn()
     {
-        if (CurrentUnit != null && CurrentUnit.isMoving) return;
-
-        Debug.Log($"Юнит {CurrentUnit?.name} пропустил ход.");
-
-        // Переход к следующему ходу автоматически заставит сработать событие onTurnEnded!
+        GameObject currentButton = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+        Animator btnAnimator = currentButton.GetComponent<Animator>();
+        btnAnimator.SetTrigger("flip");
         NextTurn();
     }
 
