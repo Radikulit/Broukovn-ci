@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
@@ -10,8 +11,11 @@ public class TurnManager : MonoBehaviour
     [Header("UI Настройки")]
     public Transform queueContainer;
     public GameObject unitIconPrefab;
-    [Tooltip("Сколько иконок отображать в шкале одновременно")]
     public int maxVisibleIcons = 6;
+
+    [Header("События конца хода")]
+    [Tooltip("Событие, вызываемое при завершении или пропуске хода")]
+    public UnityEvent onTurnEnded;
 
     private List<Unit> masterTurnOrder = new List<Unit>();
     private Queue<Unit> currentRoundQueue = new Queue<Unit>();
@@ -45,6 +49,12 @@ public class TurnManager : MonoBehaviour
 
     public void NextTurn()
     {
+        // Вызываем событие конца хода (если кто-то уже ходил)
+        if (CurrentUnit != null)
+        {
+            onTurnEnded?.Invoke();
+        }
+
         CurrentUnit?.Deselect();
 
         if (currentRoundQueue.Count == 0)
@@ -59,26 +69,28 @@ public class TurnManager : MonoBehaviour
         UpdateTurnUI();
     }
 
+    public void PassTurn()
+    {
+        if (CurrentUnit != null && CurrentUnit.isMoving) return;
+
+        Debug.Log($"Юнит {CurrentUnit?.name} пропустил ход.");
+
+        // Переход к следующему ходу автоматически заставит сработать событие onTurnEnded!
+        NextTurn();
+    }
+
     private void UpdateTurnUI()
     {
         if (!queueContainer || !unitIconPrefab || masterTurnOrder.Count == 0) return;
 
-        // Очищаем старые элементы UI
         foreach (Transform child in queueContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // Формируем полный список будущего порядка ходов
-        List<Unit> futureOrder = new List<Unit>();
-
-        // 1. Текущий ходящий юнит
-        futureOrder.Add(CurrentUnit);
-
-        // 2. Оставшиеся юниты в текущем раунде
+        List<Unit> futureOrder = new List<Unit> { CurrentUnit };
         futureOrder.AddRange(currentRoundQueue);
 
-        // 3. Дозаполняем список юнитами из следующих раундов до достижения maxVisibleIcons
         while (futureOrder.Count < maxVisibleIcons)
         {
             foreach (var unit in masterTurnOrder)
@@ -91,7 +103,6 @@ public class TurnManager : MonoBehaviour
             }
         }
 
-        // Отрисовываем иконки
         for (int i = 0; i < futureOrder.Count; i++)
         {
             CreateIcon(futureOrder[i], i == 0);
@@ -109,7 +120,6 @@ public class TurnManager : MonoBehaviour
         {
             img.sprite = unit.unitData.unitIcon;
             img.preserveAspect = true;
-            // Активный юнит яркий, остальные чуть затемнены
             img.color = isCurrent ? Color.white : new Color(0.6f, 0.6f, 0.6f, 0.75f);
         }
 
@@ -117,24 +127,5 @@ public class TurnManager : MonoBehaviour
         {
             iconObj.transform.localScale = Vector3.one * 1.15f;
         }
-    }
-    public void PassTurn()
-    {
-        // Меняем IsMoving на isMoving с маленькой буквы
-        if (CurrentUnit != null && CurrentUnit.isMoving) return;
-
-        if (UnityEngine.EventSystems.EventSystem.current != null)
-        {
-            GameObject currentButton = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
-            if (currentButton != null)
-            {
-                Animator btnAnimator = currentButton.GetComponent<Animator>();
-                if (btnAnimator != null)
-                {
-                    btnAnimator.SetTrigger("flip");
-                }
-            }
-        }
-        NextTurn();
     }
 }

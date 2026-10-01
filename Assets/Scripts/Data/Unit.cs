@@ -100,7 +100,6 @@ public class Unit : MonoBehaviour
         isMoving = true;
         Vector3 destination = GetFlatPosition(targetPos);
 
-        // 1. Поворот спрайта (true если идем вправо, false если влево)
         if (spriteRenderer != null && destination.x != transform.position.x)
         {
             spriteRenderer.flipX = destination.x > transform.position.x;
@@ -108,14 +107,12 @@ public class Unit : MonoBehaviour
 
         if (animator != null) animator.SetTrigger("move");
 
-        // 2. Движение к цели
         while (Vector3.Distance(transform.position, destination) > 0.05f)
         {
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
             yield return null;
         }
 
-        // 3. Завершение движения и сброс состояния (взгляд влево + IDLE)
         transform.position = destination;
 
         if (spriteRenderer != null) spriteRenderer.flipX = false;
@@ -128,12 +125,12 @@ public class Unit : MonoBehaviour
 
         onComplete?.Invoke();
         isMoving = false;
-        onComplete?.Invoke();
-        
-        isMoving = false;
 
-        // Передаем ход следующему
-        if (TurnManager.Instance) TurnManager.Instance.NextTurn();
+        // 2. Передаем ход дальше
+        if (TurnManager.Instance != null)
+        {
+            TurnManager.Instance.NextTurn();
+        }
     }
 
     private Vector3 GetFlatPosition(Vector3 targetPos) => new Vector3(targetPos.x, transform.position.y, targetPos.z);
