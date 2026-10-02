@@ -12,6 +12,7 @@ public class TurnManager : MonoBehaviour
     public Transform queueContainer;
     public GameObject unitIconPrefab;
     public int maxVisibleIcons = 6;
+    public TongueController tongueController;
 
     [Header("События конца хода")]
     [Tooltip("Событие, вызываемое при завершении или пропуске хода")]
@@ -49,7 +50,6 @@ public class TurnManager : MonoBehaviour
 
     public void NextTurn()
     {
-        // Вызываем событие конца хода (если кто-то уже ходил)
         if (CurrentUnit != null)
         {
             onTurnEnded?.Invoke();
@@ -57,6 +57,7 @@ public class TurnManager : MonoBehaviour
 
         CurrentUnit?.Deselect();
 
+        // Если все сходили — начинаем новый раунд и сбрасываем очередь
         if (currentRoundQueue.Count == 0)
         {
             StartNewRound();
@@ -66,7 +67,36 @@ public class TurnManager : MonoBehaviour
         CurrentUnit = currentRoundQueue.Dequeue();
         CurrentUnit.SelectUnit();
 
+        // Перерисовываем UI (количество листиков уменьшится)
         UpdateTurnUI();
+    }
+
+    private void UpdateTurnUI()
+    {
+        if (!queueContainer || !unitIconPrefab) return;
+
+        // 1. Очищаем старые листки
+        foreach (Transform child in queueContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // 2. Собираем только тех, кто еще ходит в этом раунде
+        List<Unit> remainingInThisRound = new List<Unit>();
+        if (CurrentUnit != null) remainingInThisRound.Add(CurrentUnit);
+        remainingInThisRound.AddRange(currentRoundQueue);
+
+        // 3. Спавним листки
+        foreach (var unit in remainingInThisRound)
+        {
+            CreateIcon(unit, unit == CurrentUnit);
+        }
+
+        // 4. Обновляем размер языка по оси Y
+        if (tongueController != null)
+        {
+            tongueController.UpdateTongueSize(remainingInThisRound.Count);
+        }
     }
 
     public void PassTurn()
@@ -75,36 +105,6 @@ public class TurnManager : MonoBehaviour
         Animator btnAnimator = currentButton.GetComponent<Animator>();
         btnAnimator.SetTrigger("flip");
         NextTurn();
-    }
-
-    private void UpdateTurnUI()
-    {
-        if (!queueContainer || !unitIconPrefab || masterTurnOrder.Count == 0) return;
-
-        foreach (Transform child in queueContainer)
-        {
-            Destroy(child.gameObject);
-        }
-
-        List<Unit> futureOrder = new List<Unit> { CurrentUnit };
-        futureOrder.AddRange(currentRoundQueue);
-
-        while (futureOrder.Count < maxVisibleIcons)
-        {
-            foreach (var unit in masterTurnOrder)
-            {
-                if (unit != null)
-                {
-                    futureOrder.Add(unit);
-                    if (futureOrder.Count >= maxVisibleIcons) break;
-                }
-            }
-        }
-
-        for (int i = 0; i < futureOrder.Count; i++)
-        {
-            CreateIcon(futureOrder[i], i == 0);
-        }
     }
 
     private void CreateIcon(Unit unit, bool isCurrent)
