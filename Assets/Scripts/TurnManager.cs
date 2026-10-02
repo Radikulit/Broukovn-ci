@@ -101,6 +101,7 @@ public class TurnManager : MonoBehaviour
 
     public void PassTurn()
     {
+        if (CurrentUnit != null && CurrentUnit.isMoving) return;
         GameObject currentButton = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         Animator btnAnimator = currentButton.GetComponent<Animator>();
         btnAnimator.SetTrigger("flip");
