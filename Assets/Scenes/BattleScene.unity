@@ -3455,7 +3455,7 @@ MonoBehaviour:
   tongueRect: {fileID: 746302689}
   baseHeight: 250
   heightPerExtraLeaf: 150
-  bottomPadding: 150
+  bottomPadding: 125
   lerpSpeed: 8
 --- !u!114 &762468666 stripped
 MonoBehaviour:
@@ -9407,6 +9407,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: FatSlaag
       objectReference: {fileID: 0}
+    - target: {fileID: 855631438456948806, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 2114071458415015593, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
+      propertyPath: m_TagString
+      value: pusher
+      objectReference: {fileID: 0}
     - target: {fileID: 2209309623986001980, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
       propertyPath: animator
       value: 
@@ -9466,6 +9474,18 @@ PrefabInstance:
     - target: {fileID: 3489659061842082110, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
       propertyPath: m_FlipY
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3994688678955526438, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3994688678955526438, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3994688678955526438, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 5703893649941434053, guid: 2967fd1d8b6bddb4598eea016baa0868, type: 3}
       propertyPath: m_LocalPosition.x

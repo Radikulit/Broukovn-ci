@@ -18,7 +18,14 @@ public class Unit : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Coroutine blinkCoroutine;
 
-    private void Awake() => spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+    private FatPush pusher; //zhuki i ich sposobnosti
+
+    private void Awake()
+    {
+        animator = GetComponentInChildren<Animator>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        pusher = GetComponent<FatPush>(); // Получаем ссылку на способность толкания, если она есть
+    }
 
     private void Start()
     {
@@ -31,7 +38,8 @@ public class Unit : MonoBehaviour
         // Спавн и привязка на старте в зависимости от размера
         if (unitData != null && unitData.unitSize == 2 && currentDot != null)
         {
-            currentDot.currentUnit = this;
+            // ВМЕСТО: currentDot.currentUnit = this;
+            currentDot.SetUnit(this); // Занимает сам Dot и заносит Толстяка в 4 плитки
             transform.position = GetFlatPosition(currentDot.transform.position);
         }
         else if (currentPlate != null)
@@ -82,9 +90,13 @@ public class Unit : MonoBehaviour
 
         Deselect();
         StartCoroutine(MoveRoutine(targetDot.transform.position, () => {
-            if (currentDot != null) currentDot.currentUnit = null;
+            if (currentDot != null)
+            {
+                currentDot.ClearUnit(); // Освобождаем старый Dot и его 4 плитки
+            }
+
             currentDot = targetDot;
-            currentDot.currentUnit = this;
+            currentDot.SetUnit(this);   // Занимаем новый Dot и бронируем новые 4 плитки
         }));
     }
 
@@ -124,9 +136,16 @@ public class Unit : MonoBehaviour
         }
 
         onComplete?.Invoke();
+
+        // Если у данного юнита есть компонент FatPush — активируем расталкивание
+        if (pusher != null)
+        {
+            pusher.PushUnitsInArea();
+        }
+
         isMoving = false;
 
-        // 2. Передаем ход дальше
+        // Передаем ход дальше
         if (TurnManager.Instance != null)
         {
             TurnManager.Instance.NextTurn();
@@ -138,7 +157,8 @@ public class Unit : MonoBehaviour
     private void SetRangeScale(Transform rangeTransform, float statValue)
     {
         if (rangeTransform == null) return;
-        float size = (statValue * 2f) + (unitData != null ? unitData.unitSize : 1);
+        float sizeOffset = (unitData != null && unitData.unitSize == 2) ? 1.25f : 1f;
+        float size = (statValue * 2f) + sizeOffset;
         rangeTransform.localScale = new Vector3(size, 1f, size);
     }
 

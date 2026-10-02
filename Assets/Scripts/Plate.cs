@@ -16,6 +16,27 @@ public class Plate : MonoBehaviour
         if (meshRenderer != null) defaultMaterial = meshRenderer.material;
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        // Пытаемся найти Unit на зашедшем объекте или его родителях
+        Unit enteringUnit = other.GetComponentInParent<Unit>();
+        if (enteringUnit != null)
+        {
+            // Назначаем текущим юнитом этой плитки
+            currentUnit = enteringUnit;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        Unit exitingUnit = other.GetComponentInParent<Unit>();
+        if (exitingUnit != null && currentUnit == exitingUnit)
+        {
+            // Освобождаем плитку при уходе юнита
+            currentUnit = null;
+        }
+    }
+
     private void OnMouseDown()
     {
         if (Unit.SelectedUnit != null && Unit.SelectedUnit.unitData.unitSize == 1)
