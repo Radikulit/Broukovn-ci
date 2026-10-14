@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RhinoData
   m_EditorClassIdentifier: 
   unitName: Rhino Bug
-  unitPrefab: {fileID: 636748759368138398, guid: a87c59a2b67575343823dbf5b8cb3690, type: 3}
+  unitPrefab: {fileID: 0}
   unitIcon: {fileID: 21300000, guid: 799f29cba1c99534e9496923d44141b3, type: 3}
   health: 8
   armor: 4
