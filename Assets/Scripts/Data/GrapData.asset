@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Grap Bug
   unitPrefab: {fileID: 0}
-  unitIcon: {fileID: 21300000, guid: 542334332913dfe42a892c8618e6365d, type: 3}
+  unitIcon: {fileID: 21300000, guid: 9410803bd25d76e45bb7007aaacde134, type: 3}
   health: 6
   armor: 2
   damage: 2
