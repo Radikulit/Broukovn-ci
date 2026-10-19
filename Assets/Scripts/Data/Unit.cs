@@ -110,7 +110,13 @@ public class Unit : MonoBehaviour
     private IEnumerator MoveRoutine(Vector3 targetPos, System.Action onComplete)
     {
         isMoving = true;
+
+        // Запоминаем начальную точку и вычисляем конечную
+        Vector3 startPos = transform.position;
         Vector3 destination = GetFlatPosition(targetPos);
+
+        // Вычисляем вектор направления шага Толстяка
+        Vector3 moveDir = (destination - startPos).normalized;
 
         if (spriteRenderer != null && destination.x != transform.position.x)
         {
@@ -137,10 +143,10 @@ public class Unit : MonoBehaviour
 
         onComplete?.Invoke();
 
-        // Если у данного юнита есть компонент FatPush — активируем расталкивание
+        // Передаем направление шага в логику толкания
         if (pusher != null)
         {
-            pusher.PushUnitsInArea();
+            pusher.PushUnitsInArea(moveDir);
         }
 
         isMoving = false;

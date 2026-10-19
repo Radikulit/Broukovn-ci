@@ -10074,6 +10074,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8314021898807275662, guid: f2a7bf36121b5bc4c884b5aa0e3c75de, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314021898807275662, guid: f2a7bf36121b5bc4c884b5aa0e3c75de, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 90f9e94d6c2e6c843b897f8617360e17, type: 2}
@@ -10263,6 +10267,22 @@ PrefabInstance:
       propertyPath: currentDot
       value: 
       objectReference: {fileID: 566449255}
+    - target: {fileID: 7134183776104562016, guid: dc95bc5011c844b47bb5013092a9a308, type: 3}
+      propertyPath: pushSpeed
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 7645729583962919876, guid: dc95bc5011c844b47bb5013092a9a308, type: 3}
+      propertyPath: m_Size.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7645729583962919876, guid: dc95bc5011c844b47bb5013092a9a308, type: 3}
+      propertyPath: m_Size.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7645729583962919876, guid: dc95bc5011c844b47bb5013092a9a308, type: 3}
+      propertyPath: m_Size.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9107143012501645519, guid: dc95bc5011c844b47bb5013092a9a308, type: 3}
       propertyPath: m_Name
       value: FatSlaag
