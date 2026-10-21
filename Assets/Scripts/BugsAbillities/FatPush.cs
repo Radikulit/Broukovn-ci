@@ -6,6 +6,7 @@ public class FatPush : MonoBehaviour
 {
     [Header("Настройки толчка")]
     [SerializeField] private float pushSpeed = 15f;
+    [SerializeField] private float tileSize = 1.0f; // Укажите реальный размер вашей плитки (расстояние между центрами)
 
     private Unit selfUnit;
 
@@ -16,24 +17,26 @@ public class FatPush : MonoBehaviour
 
     public void PushUnitsInArea(Vector3 moveDirection)
     {
-        if (selfUnit == null || selfUnit.attackRange == null || PlateManager.Instance == null) return;
+        if (selfUnit == null || PlateManager.Instance == null) return;
 
-        // Если вектор направления равен нулю, задаем дефолт
-        if (moveDirection == Vector3.zero) moveDirection = Vector3.right;
+        // 1. Очищаем погрешности вектора направления (оставляем чистые -1, 0, 1)
+        Vector3 cleanDir = NormalizeToGridDirection(moveDirection);
+        if (cleanDir == Vector3.zero) cleanDir = Vector3.right;
 
-        // 1. СТРОГО БРОНИРУЕМ 4 плитки под Толстяком прямо сейчас!
+        // 2. Гарантируем блокировку 4-х плиток под Толстяком
         if (selfUnit.currentDot != null)
         {
             selfUnit.currentDot.SetUnit(selfUnit);
         }
 
-        Collider attackCol = selfUnit.attackRange.GetComponent<Collider>();
+        // 3. Ищем коллайдер атак-рейнджа по тегу "pusher"
+        Collider attackCol = GetPusherCollider();
         if (attackCol == null) return;
 
         Unit[] allUnits = FindObjectsOfType<Unit>();
         List<Unit> unitsToPush = new List<Unit>();
 
-        // 2. Находим всех жертв толчка
+        // 4. Фильтруем юнитов, попавших под удар
         foreach (var otherUnit in allUnits)
         {
             if (otherUnit == selfUnit || otherUnit.isMoving) continue;
@@ -45,7 +48,7 @@ public class FatPush : MonoBehaviour
             }
         }
 
-        // 3. Сбрасываем привязку плиток у расталкиваемых жуков
+        // 5. Освобождаем текущие плитки расталкиваемых жуков
         foreach (var unit in unitsToPush)
         {
             if (unit.unitData != null && unit.unitData.unitSize == 1 && unit.currentPlate != null)
@@ -58,45 +61,52 @@ public class FatPush : MonoBehaviour
             }
         }
 
-        // 4. Распределяем жуков по свободным клеткам
+        // 6. Толкаем каждого жука ровно на 1 плитку вперед от ЕГО ТЕКУЩЕЙ ПЛИТКИ
         foreach (var unit in unitsToPush)
         {
-            PushSingleUnit(unit, moveDirection);
+            PushSingleUnit(unit, cleanDir);
         }
     }
 
-    private void PushSingleUnit(Unit otherUnit, Vector3 moveDirection)
+    private void PushSingleUnit(Unit otherUnit, Vector3 cleanDir)
     {
-        Vector3 currentPos = otherUnit.transform.position;
-
-        // 1. Округляем вектор направления до чистого направления по осям (-1, 0, 1)
-        Vector3 snapDirection = new Vector3(
-            Mathf.Round(moveDirection.x),
-            0f,
-            Mathf.Round(moveDirection.z)
-        ).normalized;
-
-        // 2. Смещаем точку поиска СТРОГО на 0.7 от размера плитки (чтобы гарантированно попасть в СОСЕДНЮЮ клетку, а не через одну)
-        float gridStep = 1.0f; // Укажите ваш точный размер плитки, если он отличается от 1.0
-        Vector3 exactTargetPos = currentPos + snapDirection * (gridStep * 0.7f);
-
         // Маленький жук (unitSize == 1)
         if (otherUnit.unitData != null && otherUnit.unitData.unitSize == 1)
         {
-            Plate targetPlate = GetClosestPlateToPoint(exactTargetPos);
+            // Берем за основу позицию ТЕКУЩЕЙ ПЛИТКИ жука (а не координаты самого жука)
+            Vector3 originTilePos = otherUnit.currentPlate != null
+                ? otherUnit.currentPlate.transform.position
+                : otherUnit.transform.position;
 
-            if (targetPlate != null)
+            // Вычисляем точку ровно на 1 шаг плитки
+            Vector3 targetTilePos = originTilePos + (cleanDir * tileSize);
+
+            // Ищем плитку ровно в этой точке
+            Plate freePlate = FindExactPlateAt(targetTilePos);
+
+            // Если целевая плитка почему-то занята или отсутствует — ищем ближайшую свободную
+            if (freePlate == null || freePlate.currentUnit != null)
             {
-                otherUnit.currentPlate = targetPlate;
-                targetPlate.currentUnit = otherUnit; // Сразу бронируем
+                freePlate = PlateManager.Instance.GetNearestEmptyPlate(targetTilePos);
+            }
 
-                StartCoroutine(AnimatePushedUnit(otherUnit, targetPlate.transform.position));
+            if (freePlate != null)
+            {
+                otherUnit.currentPlate = freePlate;
+                freePlate.currentUnit = otherUnit; // Бронируем плитку
+
+                StartCoroutine(AnimatePushedUnit(otherUnit, freePlate.transform.position));
             }
         }
         // Большой жук (unitSize == 2)
         else if (otherUnit.unitData != null && otherUnit.unitData.unitSize == 2)
         {
-            Dot freeDot = PlateManager.Instance.GetNearestEmptyDot(exactTargetPos);
+            Vector3 originDotPos = otherUnit.currentDot != null
+                ? otherUnit.currentDot.transform.position
+                : otherUnit.transform.position;
+
+            Vector3 targetDotPos = originDotPos + (cleanDir * tileSize);
+            Dot freeDot = PlateManager.Instance.GetNearestEmptyDot(targetDotPos);
 
             if (freeDot != null)
             {
@@ -108,34 +118,58 @@ public class FatPush : MonoBehaviour
         }
     }
 
-    // Поиск САМОЙ близкой свободной плитки к точке смещения
-    private Plate GetClosestPlateToPoint(Vector3 targetWorldPos)
+    // Ищем коллайдер объекта AttackRange с тегом "pusher"
+    private Collider GetPusherCollider()
+    {
+        if (selfUnit.attackRange != null && selfUnit.attackRange.CompareTag("pusher"))
+        {
+            return selfUnit.attackRange.GetComponent<Collider>();
+        }
+
+        // Если компонент висит на дочернем объекте
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (var col in colliders)
+        {
+            if (col.CompareTag("pusher")) return col;
+        }
+
+        return null;
+    }
+
+    // Находим плитку строго под конкретной точкой
+    private Plate FindExactPlateAt(Vector3 targetPos)
     {
         Plate[] allPlates = FindObjectsOfType<Plate>();
-        Plate closestPlate = null;
+        Plate bestPlate = null;
         float minDistance = float.MaxValue;
 
         foreach (var plate in allPlates)
         {
-            // Пропускаем плитки, которые уже заняты
             if (plate.currentUnit != null) continue;
 
-            // Исключаем плитки под самим Толстяком
-            if (selfUnit.currentDot != null)
+            // Исключаем плитки под брюхом Толстяка
+            if (selfUnit.currentDot != null && Vector3.Distance(selfUnit.transform.position, plate.transform.position) < (tileSize * 0.8f))
             {
-                float distToPusher = Vector3.Distance(selfUnit.transform.position, plate.transform.position);
-                if (distToPusher < 0.9f) continue;
+                continue;
             }
 
-            float dist = Vector3.Distance(targetWorldPos, plate.transform.position);
-            if (dist < minDistance)
+            float dist = Vector3.Distance(targetPos, plate.transform.position);
+            // Плитка должна быть совсем близко к расчетной точке (в пределах пол-плитки)
+            if (dist < (tileSize * 0.5f) && dist < minDistance)
             {
                 minDistance = dist;
-                closestPlate = plate;
+                bestPlate = plate;
             }
         }
 
-        return closestPlate;
+        return bestPlate;
+    }
+
+    private Vector3 NormalizeToGridDirection(Vector3 dir)
+    {
+        float x = Mathf.Abs(dir.x) > 0.3f ? Mathf.Sign(dir.x) : 0f;
+        float z = Mathf.Abs(dir.z) > 0.3f ? Mathf.Sign(dir.z) : 0f;
+        return new Vector3(x, 0f, z).normalized;
     }
 
     private IEnumerator AnimatePushedUnit(Unit pushedUnit, Vector3 targetWorldPos)

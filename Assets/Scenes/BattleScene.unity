@@ -10268,6 +10268,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 566449255}
     - target: {fileID: 7134183776104562016, guid: dc95bc5011c844b47bb5013092a9a308, type: 3}
+      propertyPath: tileSize
+      value: 0.425
+      objectReference: {fileID: 0}
+    - target: {fileID: 7134183776104562016, guid: dc95bc5011c844b47bb5013092a9a308, type: 3}
       propertyPath: pushSpeed
       value: 12
       objectReference: {fileID: 0}
