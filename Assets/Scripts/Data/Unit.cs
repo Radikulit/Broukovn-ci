@@ -18,13 +18,10 @@ public class Unit : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Coroutine blinkCoroutine;
 
-    private FatPush pusher; //zhuki i ich sposobnosti
-
     private void Awake()
     {
         animator = GetComponentInChildren<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        pusher = GetComponent<FatPush>(); // Получаем ссылку на способность толкания, если она есть
     }
 
     private void Start()
@@ -110,12 +107,8 @@ public class Unit : MonoBehaviour
     private IEnumerator MoveRoutine(Vector3 targetPos, System.Action onComplete)
     {
         isMoving = true;
-
-        // Запоминаем начальную точку и вычисляем конечную
         Vector3 startPos = transform.position;
         Vector3 destination = GetFlatPosition(targetPos);
-
-        // Вычисляем вектор направления шага Толстяка
         Vector3 moveDir = (destination - startPos).normalized;
 
         if (spriteRenderer != null && destination.x != transform.position.x)
@@ -125,6 +118,7 @@ public class Unit : MonoBehaviour
 
         if (animator != null) animator.SetTrigger("move");
 
+        // Плавное движение к цели
         while (Vector3.Distance(transform.position, destination) > 0.05f)
         {
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
@@ -143,15 +137,8 @@ public class Unit : MonoBehaviour
 
         onComplete?.Invoke();
 
-        // Передаем направление шага в логику толкания
-        if (pusher != null)
-        {
-            pusher.PushUnitsInArea(moveDir);
-        }
-
         isMoving = false;
 
-        // Передаем ход дальше
         if (TurnManager.Instance != null)
         {
             TurnManager.Instance.NextTurn();

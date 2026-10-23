@@ -227,7 +227,6 @@ GameObject:
   - component: {fileID: 2182561038344168435}
   - component: {fileID: 4110594432155473189}
   - component: {fileID: 4488566037179246598}
-  - component: {fileID: 7134183776104562016}
   m_Layer: 0
   m_Name: FatSlaag
   m_TagString: Untagged
@@ -294,16 +293,3 @@ MonoBehaviour:
   attackRange: {fileID: 7348075659606112384}
   movementRange: {fileID: 1512818527881677229}
   isMoving: 0
---- !u!114 &7134183776104562016
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9107143012501645519}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4428ab2f295fccc48837f65ef6ef497b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pushSpeed: 15
