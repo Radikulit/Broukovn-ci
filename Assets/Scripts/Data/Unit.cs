@@ -26,16 +26,9 @@ public class Unit : MonoBehaviour
 
     private void Start()
     {
-        if (unitData != null)
-        {
-            SetRangeScale(movementRange, unitData.speed);
-            SetRangeScale(attackRange, unitData.range);
-        }
-
         // Спавн и привязка на старте в зависимости от размера
         if (unitData != null && unitData.unitSize == 2 && currentDot != null)
         {
-            // ВМЕСТО: currentDot.currentUnit = this;
             currentDot.SetUnit(this); // Занимает сам Dot и заносит Толстяка в 4 плитки
             transform.position = GetFlatPosition(currentDot.transform.position);
         }
@@ -63,7 +56,6 @@ public class Unit : MonoBehaviour
         if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
         blinkCoroutine = StartCoroutine(BlinkRoutine());
     }
-
 
     // Движение маленького юнита по Плиткам (unitSize = 1)
     public void MoveToPlate(Plate targetPlate)
@@ -146,14 +138,6 @@ public class Unit : MonoBehaviour
     }
 
     private Vector3 GetFlatPosition(Vector3 targetPos) => new Vector3(targetPos.x, transform.position.y, targetPos.z);
-
-    private void SetRangeScale(Transform rangeTransform, float statValue)
-    {
-        if (rangeTransform == null) return;
-        float sizeOffset = (unitData != null && unitData.unitSize == 2) ? 1.25f : 1f;
-        float size = (statValue * 2f) + sizeOffset;
-        rangeTransform.localScale = new Vector3(size, 1f, size);
-    }
 
     public void Deselect()
     {
